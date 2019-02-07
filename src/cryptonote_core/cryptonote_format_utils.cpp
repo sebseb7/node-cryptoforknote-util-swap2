@@ -429,7 +429,10 @@ namespace cryptonote
   //---------------------------------------------------------------
   bool get_block_hashing_blob(const block& b, blobdata& blob)
   {
-    blob = t_serializable_object_to_blob(static_cast<const block_header&>(b));
+    blob = t_serializable_object_to_blob(b.major_version);
+    blob.append(reinterpret_cast<const char*>(&b.minor_version), sizeof(b.minor_version));
+    blob.append(reinterpret_cast<const char*>(&b.timestamp), sizeof(b.timestamp));
+    blob.append(reinterpret_cast<const char*>(&b.prev_id), sizeof(b.prev_id));
     crypto::hash tree_root_hash = get_tx_tree_hash(b);
     blob.append(reinterpret_cast<const char*>(&tree_root_hash), sizeof(tree_root_hash));
     blob.append(tools::get_varint_data(b.tx_hashes.size()+1));

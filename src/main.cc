@@ -130,12 +130,13 @@ NAN_METHOD(get_block_id) {
 }
 
 NAN_METHOD(construct_block_blob) {
-    if (info.Length() < 2) return THROW_ERROR_EXCEPTION("You must provide two arguments.");
+    if (info.Length() < 3) return THROW_ERROR_EXCEPTION("You must provide three arguments.");
 
     Local<Object> block_template_buf = info[0]->ToObject();
-    Local<Object> nonce_buf = info[1]->ToObject();
+    Local<Object> pow_buf = info[1]->ToObject();
+    Local<Object> nonce_buf = info[2]->ToObject();
 
-    if (!Buffer::HasInstance(block_template_buf) || !Buffer::HasInstance(nonce_buf)) return THROW_ERROR_EXCEPTION("Both arguments should be buffer objects.");
+    if (!Buffer::HasInstance(block_template_buf) || !Buffer::HasInstance(nonce_buf)) return THROW_ERROR_EXCEPTION("arguments 1 and 3 should be buffer objects.");
     if (Buffer::Length(nonce_buf) != 4) return THROW_ERROR_EXCEPTION("Nonce buffer has invalid size.");
 
     uint32_t nonce = *reinterpret_cast<uint32_t*>(Buffer::Data(nonce_buf));
@@ -143,9 +144,9 @@ NAN_METHOD(construct_block_blob) {
     blobdata output = "";
 
     enum BLOB_TYPE blob_type = BLOB_TYPE_CRYPTONOTE;
-    if (info.Length() >= 3) {
-        if (!info[2]->IsNumber()) return THROW_ERROR_EXCEPTION("Argument 3 should be a number");
-        blob_type = static_cast<enum BLOB_TYPE>(Nan::To<int>(info[2]).FromMaybe(0));
+    if (info.Length() >= 4) {
+        if (!info[3]->IsNumber()) return THROW_ERROR_EXCEPTION("Argument 4 should be a number");
+        blob_type = static_cast<enum BLOB_TYPE>(Nan::To<int>(info[3]).FromMaybe(0));
     }
 
     block b = AUTO_VAL_INIT(b);
@@ -153,6 +154,40 @@ NAN_METHOD(construct_block_blob) {
     if (!parse_and_validate_block_from_blob(block_template_blob, b)) return THROW_ERROR_EXCEPTION("Failed to parse block");
 
     b.nonce = nonce;
+
+	b.cycle01 = pow_buf->Get(0)->IntegerValue();
+	b.cycle02 = pow_buf->Get(1)->IntegerValue();
+	b.cycle03 = pow_buf->Get(2)->IntegerValue();
+	b.cycle04 = pow_buf->Get(3)->IntegerValue();
+	b.cycle05 = pow_buf->Get(4)->IntegerValue();
+	b.cycle06 = pow_buf->Get(5)->IntegerValue();
+	b.cycle07 = pow_buf->Get(6)->IntegerValue();
+	b.cycle08 = pow_buf->Get(7)->IntegerValue();
+	b.cycle09 = pow_buf->Get(8)->IntegerValue();
+	b.cycle10 = pow_buf->Get(9)->IntegerValue();
+	b.cycle11 = pow_buf->Get(10)->IntegerValue();
+	b.cycle12 = pow_buf->Get(11)->IntegerValue();
+	b.cycle13 = pow_buf->Get(12)->IntegerValue();
+	b.cycle14 = pow_buf->Get(13)->IntegerValue();
+	b.cycle15 = pow_buf->Get(14)->IntegerValue();
+	b.cycle16 = pow_buf->Get(15)->IntegerValue();
+	b.cycle17 = pow_buf->Get(16)->IntegerValue();
+	b.cycle18 = pow_buf->Get(17)->IntegerValue();
+	b.cycle19 = pow_buf->Get(18)->IntegerValue();
+	b.cycle20 = pow_buf->Get(19)->IntegerValue();
+	b.cycle21 = pow_buf->Get(20)->IntegerValue();
+	b.cycle22 = pow_buf->Get(21)->IntegerValue();
+	b.cycle23 = pow_buf->Get(22)->IntegerValue();
+	b.cycle24 = pow_buf->Get(23)->IntegerValue();
+	b.cycle25 = pow_buf->Get(24)->IntegerValue();
+	b.cycle26 = pow_buf->Get(25)->IntegerValue();
+	b.cycle27 = pow_buf->Get(26)->IntegerValue();
+	b.cycle28 = pow_buf->Get(27)->IntegerValue();
+	b.cycle29 = pow_buf->Get(28)->IntegerValue();
+	b.cycle30 = pow_buf->Get(29)->IntegerValue();
+	b.cycle31 = pow_buf->Get(30)->IntegerValue();
+	b.cycle32 = pow_buf->Get(31)->IntegerValue();
+
     if (blob_type == BLOB_TYPE_FORKNOTE2) {
         block parent_block;
         b.parent_block.nonce = nonce;
